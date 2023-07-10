@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "547790509173",
+    "project_id": "documentmanagement-ad3ca",
+    "storage_bucket": "documentmanagement-ad3ca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:547790509173:android:fe294c8150f9385ef7143c",
+        "android_client_info": {
+          "package_name": "com.example.dm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "547790509173-k3jqq4e5ukts44pomjcclt7lric9g722.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPcCUbm-5IhlyWCLVB0eQOB-AXfpkOE-A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "547790509173-k3jqq4e5ukts44pomjcclt7lric9g722.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
