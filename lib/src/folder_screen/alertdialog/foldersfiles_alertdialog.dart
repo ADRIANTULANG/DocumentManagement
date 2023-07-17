@@ -97,7 +97,13 @@ class FoldersFileAlertDialog {
                       ),
                       InkWell(
                         onTap: () {
-                          controller.uploadFile();
+                          if (controller.fileName.value == "") {
+                            Get.snackbar("Message",
+                                "Please select image first, Tap on the upload icon in the box to open gallery",
+                                backgroundColor: ColorServices.gold);
+                          } else {
+                            controller.uploadFile();
+                          }
                         },
                         child: Text(
                           "Upload",
