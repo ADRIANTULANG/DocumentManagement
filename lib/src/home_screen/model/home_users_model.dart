@@ -16,6 +16,7 @@ class UsersModel {
   String image;
   RxBool isSelected;
   String contactno;
+  String fcmToken;
 
   UsersModel({
     required this.id,
@@ -24,6 +25,7 @@ class UsersModel {
     required this.image,
     required this.email,
     required this.contactno,
+    required this.fcmToken,
     required this.isSelected,
   });
 
@@ -32,6 +34,7 @@ class UsersModel {
         firstname: json["firstname"],
         lastname: json["lastname"],
         email: json["email"],
+        fcmToken: json["fcmToken"],
         isSelected: false.obs,
         image: json["image"],
         contactno: json["contactno"],
@@ -41,6 +44,7 @@ class UsersModel {
         "id": id,
         "firstname": firstname,
         "isSelected": isSelected,
+        "fcmToken": fcmToken,
         "image": image,
         "lastname": lastname,
         "email": email,

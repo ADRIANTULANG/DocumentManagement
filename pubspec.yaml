@@ -54,6 +54,7 @@ dependencies:
   percent_indicator: ^4.0.1
   flutter_launcher_icons: ^0.13.1
   flutter_spinkit: ^5.2.0
+  device_info_plus: ^9.0.1
 
 dev_dependencies:
   flutter_test:

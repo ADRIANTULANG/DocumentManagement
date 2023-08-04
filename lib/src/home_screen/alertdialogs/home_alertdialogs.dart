@@ -1,13 +1,11 @@
 import 'package:dm/services/colors_services.dart';
 import 'package:dm/src/home_screen/controller/home_controller.dart';
-import 'package:dm/src/login_screen/view/login_view.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:intl/intl.dart';
-import '../../../services/getstorage_services.dart';
 import '../model/home_files_model.dart';
 
 class HomeAlertDialog {
@@ -708,9 +706,7 @@ class HomeAlertDialog {
               ),
               InkWell(
                 onTap: () {
-                  Get.back();
-                  Get.find<StorageServices>().removeStorageCredentials();
-                  Get.offAll(() => LoginScreenView());
+                  Get.find<HomeController>().logout();
                 },
                 child: Text(
                   "Yes",

@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import 'getstorage_services.dart';
+import 'package:http/http.dart' as http;
 
 class NotificationServices extends GetxService {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
@@ -95,27 +97,30 @@ class NotificationServices extends GetxService {
     // }
   }
 
-  // sendNotification({required String userToken}) async {
-  //   print(userToken);
-  //   var body = jsonEncode({
-  //     "to":
-  //         "fSw60xJBTW2Bhvksvp8aQ2:APA91bFtS5cuZoDGdlJD2-69OqyTo_8QM62INOk3Ep-B-04820LQkPIowmT416dVnYAxo6d89PILD1zWLjFS0gTeHpRjN_y3nn925uMmpqLjdmf_Ns3tWFnSpOYDTS_5WSQwc0ilfIJL",
-  //     "notification": {
-  //       "body": "Hi your order is Accepted",
-  //       "title": "Food3ip",
-  //       "subtitle": "",
-  //     }
-  //   });
-  //   var e2epushnotif =
-  //       await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
-  //           headers: {
-  //             "Authorization":
-  //                 "key=AAAAFXgQldg:APA91bH0blj9KQykFmRZ1Pjub61SPwFyaq-YjvtH1vTvsOeNQ6PTWCYm5S7pOZIuB5zuc7hrFFYsRbuxEB8vF9N5nQoW9fZckjy4bwwltxf4ATPeBDH4L4VlZ1yyVBHF3OKr3yVZ_Ioy",
-  //             "Content-Type": "application/json"
-  //           },
-  //           body: body);
-  //   print("e2e notif: ${e2epushnotif.body}");
-  // }
+  sendNotification(
+      {required String userToken,
+      required String message,
+      required String title,
+      required String subtitle}) async {
+    print(userToken);
+    var body = jsonEncode({
+      "to": "$userToken",
+      "notification": {
+        "body": message,
+        "title": title,
+        "subtitle": subtitle,
+      }
+    });
+    var pushNotif =
+        await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+            headers: {
+              "Authorization":
+                  "key=AAAAf4rb1HU:APA91bFL3xmTcRfpC2G1bzgPpyuGjTHnH1u8QlhqXX7VccNJ6kxt2l5YZBiZfQqOcD0v75pctu444C87x34TrXGxLOaezfHK2RWcUEOJTGTCPdYdCHvFsNg0tUmIapYNPFaElM2-2qWl",
+              "Content-Type": "application/json"
+            },
+            body: body);
+    print("push notif: ${pushNotif.body}");
+  }
 
   Future<void> getToken() async {
     token = await messaging.getToken();

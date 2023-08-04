@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
+import '../../login_screen/view/login_view.dart';
 import '../model/home_files_model.dart';
 import '../model/home_users_model.dart';
 
@@ -394,6 +395,7 @@ class HomeController extends GetxController {
           "email": users[i]['email'],
           "contactno": users[i]['contactno'],
           "image": profileImage,
+          "fcmToken": users[i]['fcmToken'],
         };
         data.add(obj);
       }
@@ -431,18 +433,32 @@ class HomeController extends GetxController {
           .doc(Get.find<StorageServices>().storage.read('id'));
       WriteBatch batch = await FirebaseFirestore.instance.batch();
       for (var i = 0; i < usersList.length; i++) {
-        batch.set(
-            await FirebaseFirestore.instance.collection('sharedfiles').doc(), {
-          "datecreated": DateTime.now(),
-          "name": filedDetails.name,
-          "owner": userDocumentReference,
-          "parent": "root",
-          "sharedto": usersList[i].id,
-          "type": filedDetails.type,
-          "url": filedDetails.url,
-        });
+        if (usersList[i].isSelected.value == true) {
+          batch.set(
+              await FirebaseFirestore.instance.collection('sharedfiles').doc(),
+              {
+                "datecreated": DateTime.now(),
+                "name": filedDetails.name,
+                "owner": userDocumentReference,
+                "parent": "root",
+                "sharedto": usersList[i].id,
+                "type": filedDetails.type,
+                "url": filedDetails.url,
+              });
+        }
       }
       await batch.commit();
+      for (var i = 0; i < usersList.length; i++) {
+        if (usersList[i].isSelected.value == true &&
+            usersList[i].fcmToken != "") {
+          sendNotification(
+              userToken: usersList[i].fcmToken,
+              message:
+                  "${Get.find<StorageServices>().storage.read('firstname')} shared some files with you",
+              title: "Shared files",
+              subtitle: "");
+        }
+      }
       Get.back();
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('File Shared Successfully'),
@@ -467,5 +483,40 @@ class HomeController extends GetxController {
     } else {
       filesList.assignAll(filesList_masterList);
     }
+  }
+
+  logout() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(Get.find<StorageServices>().storage.read('id'))
+        .update({"deviceID": "", "deviceName": ""});
+    Get.back();
+    Get.find<StorageServices>().removeStorageCredentials();
+    Get.offAll(() => LoginScreenView());
+  }
+
+  sendNotification(
+      {required String userToken,
+      required String message,
+      required String title,
+      required String subtitle}) async {
+    print(userToken);
+    var body = jsonEncode({
+      "to": "$userToken",
+      "notification": {
+        "body": message,
+        "title": title,
+        "subtitle": subtitle,
+      }
+    });
+    var pushNotif =
+        await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+            headers: {
+              "Authorization":
+                  "key=AAAAf4rb1HU:APA91bFL3xmTcRfpC2G1bzgPpyuGjTHnH1u8QlhqXX7VccNJ6kxt2l5YZBiZfQqOcD0v75pctu444C87x34TrXGxLOaezfHK2RWcUEOJTGTCPdYdCHvFsNg0tUmIapYNPFaElM2-2qWl",
+              "Content-Type": "application/json"
+            },
+            body: body);
+    print("push notif: ${pushNotif.body}");
   }
 }
