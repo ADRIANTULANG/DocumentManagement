@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:get/get.dart';
+import 'package:open_file_plus/open_file_plus.dart';
 
 import '../../../services/getstorage_services.dart';
 import '../model/sharedfile_files_model.dart';
@@ -41,6 +44,9 @@ class SharedFileController extends GetxController {
           "parent": files[i]['parent'],
           "type": files[i]['type'],
           "url": files[i]['url'],
+          "savePath": files[i].data().containsKey('savePath') == true
+              ? files[i]['savePath']
+              : "",
           "datecreated": files[i]['datecreated'].toDate().toString(),
         };
         data.add(obj);
@@ -112,6 +118,37 @@ class SharedFileController extends GetxController {
       }
     } else {
       sharedFilesList.assignAll(sharedFilesList_masterList);
+    }
+  }
+
+  openFile(
+      {required String link,
+      required String path,
+      required String documentID,
+      required int index,
+      required BuildContext context,
+      required String filename}) async {
+    File file = File(path);
+    var isExist = await file.exists();
+    if (isExist == true) {
+      OpenFile.open(path);
+    } else {
+      FileDownloader.downloadFile(
+          url: link,
+          name: filename,
+          onProgress: (fileName, progress) {},
+          onDownloadCompleted: (String path) async {
+            log(path);
+            sharedFilesList[index].savePath = path;
+            await FirebaseFirestore.instance
+                .collection('sharedfiles')
+                .doc(documentID)
+                .update({"savePath": path});
+            OpenFile.open(path);
+          },
+          onDownloadError: (String error) {
+            print("ERROR: $error");
+          });
     }
   }
 }

@@ -617,11 +617,15 @@ class HomeAlertDialog {
                               SizedBox(
                                 width: 1.w,
                               ),
-                              Text(
-                                controller.usersList[index].email,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 9.sp),
+                              Container(
+                                width: 40.w,
+                                child: Text(
+                                  controller.usersList[index].email,
+                                  style: TextStyle(
+                                      overflow: TextOverflow.ellipsis,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 9.sp),
+                                ),
                               ),
                             ],
                           ),

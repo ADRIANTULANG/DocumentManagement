@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -10,6 +11,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:get/get.dart';
+import 'package:open_file_plus/open_file_plus.dart';
 
 import '../../../services/getstorage_services.dart';
 import '../../home_screen/model/home_files_model.dart';
@@ -78,6 +80,9 @@ class FolderController extends GetxController {
           "parent": files[i]['parent'],
           "type": files[i]['type'],
           "url": files[i]['url'],
+          "savePath": files[i].data().containsKey('savePath') == true
+              ? files[i]['savePath']
+              : "",
           "datecreated": files[i]['datecreated'].toDate().toString(),
         };
         data.add(obj);
@@ -305,6 +310,37 @@ class FolderController extends GetxController {
       }
     } else {
       folderFileList.assignAll(folderFileList_masterList);
+    }
+  }
+
+  openFile(
+      {required String link,
+      required String path,
+      required String documentID,
+      required int index,
+      required BuildContext context,
+      required String filename}) async {
+    File file = File(path);
+    var isExist = await file.exists();
+    if (isExist == true) {
+      OpenFile.open(path);
+    } else {
+      FileDownloader.downloadFile(
+          url: link,
+          name: filename,
+          onProgress: (fileName, progress) {},
+          onDownloadCompleted: (String path) async {
+            log(path);
+            folderFileList[index].savePath = path;
+            await FirebaseFirestore.instance
+                .collection('filesandfolders')
+                .doc(documentID)
+                .update({"savePath": path});
+            OpenFile.open(path);
+          },
+          onDownloadError: (String error) {
+            print("ERROR: $error");
+          });
     }
   }
 }

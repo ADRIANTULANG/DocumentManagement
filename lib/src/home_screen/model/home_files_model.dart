@@ -18,6 +18,7 @@ class FilesModels {
   RxBool isSelected;
   RxBool isDownloading;
   RxDouble progress;
+  String savePath;
 
   FilesModels({
     required this.id,
@@ -29,6 +30,7 @@ class FilesModels {
     required this.isSelected,
     required this.progress,
     required this.isDownloading,
+    required this.savePath,
   });
 
   factory FilesModels.fromJson(Map<String, dynamic> json) => FilesModels(
@@ -37,6 +39,7 @@ class FilesModels {
         parent: json["parent"],
         type: json["type"],
         url: json["url"],
+        savePath: json["savePath"],
         isSelected: false.obs,
         isDownloading: false.obs,
         progress: 0.0.obs,
@@ -46,6 +49,7 @@ class FilesModels {
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
+        "savePath": savePath,
         "isDownloading": isDownloading,
         "progress": progress,
         "isSelected": isSelected,

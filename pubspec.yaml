@@ -55,6 +55,8 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   flutter_spinkit: ^5.2.0
   device_info_plus: ^9.0.1
+  open_file_plus: ^3.4.1
+
 
 dev_dependencies:
   flutter_test:

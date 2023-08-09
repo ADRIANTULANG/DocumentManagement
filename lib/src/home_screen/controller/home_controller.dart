@@ -1,16 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dm/services/getstorage_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:open_file_plus/open_file_plus.dart';
 import '../../login_screen/view/login_view.dart';
 import '../model/home_files_model.dart';
 import '../model/home_users_model.dart';
@@ -74,6 +75,9 @@ class HomeController extends GetxController {
           "parent": files[i]['parent'],
           "type": files[i]['type'],
           "url": files[i]['url'],
+          "savePath": files[i].data().containsKey('savePath') == true
+              ? files[i]['savePath']
+              : "",
           "datecreated": files[i]['datecreated'].toDate().toString(),
         };
         data.add(obj);
@@ -93,6 +97,7 @@ class HomeController extends GetxController {
     foldersList.add(FilesModels(
         isDownloading: false.obs,
         progress: 0.0.obs,
+        savePath: "",
         datecreated: DateTime.now(),
         id: "root",
         name: "root",
@@ -289,7 +294,12 @@ class HomeController extends GetxController {
           double percent = progress / 100;
           filesList[index].progress.value = percent;
         },
-        onDownloadCompleted: (String path) {
+        onDownloadCompleted: (String path) async {
+          log(path);
+          File file = File(path);
+          var isExist = await file.exists();
+          log(isExist.toString());
+
           filesList[index].isDownloading.value = false;
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text('File Successfully downloaded'),
@@ -518,5 +528,36 @@ class HomeController extends GetxController {
             },
             body: body);
     print("push notif: ${pushNotif.body}");
+  }
+
+  openFile(
+      {required String link,
+      required String path,
+      required String documentID,
+      required int index,
+      required BuildContext context,
+      required String filename}) async {
+    File file = File(path);
+    var isExist = await file.exists();
+    if (isExist == true) {
+      OpenFile.open(path);
+    } else {
+      FileDownloader.downloadFile(
+          url: link,
+          name: filename,
+          onProgress: (fileName, progress) {},
+          onDownloadCompleted: (String path) async {
+            log(path);
+            filesList[index].savePath = path;
+            await FirebaseFirestore.instance
+                .collection('filesandfolders')
+                .doc(documentID)
+                .update({"savePath": path});
+            OpenFile.open(path);
+          },
+          onDownloadError: (String error) {
+            print("ERROR: $error");
+          });
+    }
   }
 }

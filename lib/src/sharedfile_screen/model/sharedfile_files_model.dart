@@ -14,6 +14,8 @@ class SharedFiles {
   String parent;
   String type;
   String url;
+  String savePath;
+
   RxBool isDownloading;
   RxDouble progress;
   DateTime datecreated;
@@ -21,6 +23,7 @@ class SharedFiles {
   SharedFiles({
     required this.id,
     required this.name,
+    required this.savePath,
     required this.parent,
     required this.type,
     required this.url,
@@ -32,6 +35,7 @@ class SharedFiles {
   factory SharedFiles.fromJson(Map<String, dynamic> json) => SharedFiles(
         id: json["id"],
         name: json["name"],
+        savePath: json["savePath"],
         parent: json["parent"],
         type: json["type"],
         url: json["url"],
@@ -44,6 +48,7 @@ class SharedFiles {
         "id": id,
         "name": name,
         "parent": parent,
+        "savePath": savePath,
         "type": type,
         "url": url,
         "isDownloading": isDownloading,
